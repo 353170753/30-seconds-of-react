@@ -1,7 +1,8 @@
 ---
 title: Reduce Unnecessary Re-rendering
-tags: components,hooks,rendering
-cover: blog_images/image.jpg
+tags: components,hooks,state,rendering
+author: SageKyle
+cover: blog_images/interior-12.jpg
 firstSeen: 2023-02-11T20:00:00-04:00
 ---
 
