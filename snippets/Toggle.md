@@ -1,35 +1,48 @@
-### Toggle
+---
+title: Toggle
+tags: components,state
+cover: blog_images/cows.jpg
+firstSeen: 2018-10-27T20:35:37+03:00
+lastUpdated: 2020-11-16T16:50:57+02:00
+---
 
 Renders a toggle component.
 
-* Use the `React.useState()` to initialize the `isToggleOn` state variable to `false`.
-* Use an object, `style`, to hold the styles for individual components and their states.
-* Return a `<button>` that alters the component's `isToggledOn` when its `onClick` event is fired and determine the appearance of the content based on `isToggleOn`, applying the appropriate CSS rules from the `style` object.
+- Use the `useState()` hook to initialize the `isToggledOn` state variable to `defaultToggled`.
+- Render an `<input>` and bind its `onClick` event to update the `isToggledOn` state variable, applying the appropriate `className` to the wrapping `<label>`.
+
+```css
+.toggle input[type="checkbox"] {
+  display: none;
+}
+
+.toggle.on {
+  background-color: green;
+}
+
+.toggle.off {
+  background-color: red;
+}
+```
 
 ```jsx
-function Toggle(props) {
-  const [isToggleOn, setIsToggleOn] = React.useState(false);
-  style = {
-    on: {
-      backgroundColor: 'green'
-    },
-    off: {
-      backgroundColor: 'grey'
-    }
-  };
+const Toggle = ({ defaultToggled = false }) => {
+  const [isToggleOn, setIsToggleOn] = React.useState(defaultToggled);
 
   return (
-    <button onClick={() => setIsToggleOn(!isToggleOn)} style={isToggleOn ? style.on : style.off}>
+    <label className={isToggleOn ? 'toggle on' : 'toggle off'}>
+      <input
+        type="checkbox"
+        checked={isToggleOn}
+        onChange={() => setIsToggleOn(!isToggleOn)}
+      />
       {isToggleOn ? 'ON' : 'OFF'}
-    </button>
+    </label>
   );
-}
+};
+
 ```
 
 ```jsx
 ReactDOM.render(<Toggle />, document.getElementById('root'));
 ```
-
-<!-- tags: visual,state  -->
-
-<!-- expertise: 0 -->

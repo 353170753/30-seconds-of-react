@@ -1,28 +1,41 @@
-### TreeView
+---
+title: Expandable object tree view
+tags: components,object,state,recursion
+author: chalarangelo
+cover: blog_images/digital-nomad-9.jpg
+firstSeen: 2019-02-06T22:17:03+02:00
+lastUpdated: 2020-11-16T16:50:57+02:00
+---
 
 Renders a tree view of a JSON object or array with collapsible content.
 
-* Use object destructuring to set defaults for certain props.
-* Use the value of the `toggled` prop to determine the initial state of the content (collapsed/expanded).
-* Use the `React.setState()` hook to create the `isToggled` state variable and give it the value of the `toggled` prop initially.
-* Return a `<div>` to wrap the contents of the component and the `<span>` element, used to alter the component's `isToggled` state.
-* Determine the appearance of the component, based on `isParentToggled`, `isToggled`, `name` and `Array.isArray()` on `data`.
-* For each child in `data`, determine if it is an object or array and recursively render a sub-tree.
-* Otherwise, render a `<p>` element with the appropriate style.
+- Use the value of the `toggled` prop to determine the initial state of the content (collapsed/expanded).
+- Use the `useState()` hook to create the `isToggled` state variable and give it the value of the `toggled` prop initially.
+- Render a `<span>` element and bind its `onClick` event to alter the component's `isToggled` state.
+- Determine the appearance of the component, based on `isParentToggled`, `isToggled`, `name` and checking for `Array.isArray()` on `data`.
+- For each child in `data`, determine if it is an object or array and recursively render a sub-tree or a text element with the appropriate style.
 
 ```css
 .tree-element {
-  margin: 0;
+  margin: 0 0 0 4px;
   position: relative;
 }
 
-div.tree-element:before {
+.tree-element.is-child {
+  margin-left: 16px;
+}
+
+div.tree-element::before {
   content: '';
   position: absolute;
   top: 24px;
   left: 1px;
   height: calc(100% - 48px);
   border-left: 1px solid gray;
+}
+
+p.tree-element {
+  margin-left: 16px;
 }
 
 .toggler {
@@ -47,57 +60,60 @@ div.tree-element:before {
 ```
 
 ```jsx
-function TreeView({
+const TreeView = ({
   data,
   toggled = true,
   name = null,
   isLast = true,
   isChildElement = false,
   isParentToggled = true
-}) {
+}) => {
   const [isToggled, setIsToggled] = React.useState(toggled);
+  const isDataArray = Array.isArray(data);
 
   return (
     <div
-      style={{ marginLeft: isChildElement ? 16 : 4 + 'px' }}
-      className={isParentToggled ? 'tree-element' : 'tree-element collapsed'}
+      className={`tree-element ${isParentToggled && 'collapsed'} ${
+        isChildElement && 'is-child'
+      }`}
     >
       <span
         className={isToggled ? 'toggler' : 'toggler closed'}
         onClick={() => setIsToggled(!isToggled)}
       />
       {name ? <strong>&nbsp;&nbsp;{name}: </strong> : <span>&nbsp;&nbsp;</span>}
-      {Array.isArray(data) ? '[' : '{'}
+      {isDataArray ? '[' : '{'}
       {!isToggled && '...'}
       {Object.keys(data).map((v, i, a) =>
-        typeof data[v] == 'object' ? (
+        typeof data[v] === 'object' ? (
           <TreeView
+            key={`${name}-${v}-${i}`}
             data={data[v]}
             isLast={i === a.length - 1}
-            name={Array.isArray(data) ? null : v}
+            name={isDataArray ? null : v}
             isChildElement
             isParentToggled={isParentToggled && isToggled}
           />
         ) : (
           <p
-            style={{ marginLeft: 16 + 'px' }}
+            key={`${name}-${v}-${i}`}
             className={isToggled ? 'tree-element' : 'tree-element collapsed'}
           >
-            {Array.isArray(data) ? '' : <strong>{v}: </strong>}
+            {isDataArray ? '' : <strong>{v}: </strong>}
             {data[v]}
             {i === a.length - 1 ? '' : ','}
           </p>
         )
       )}
-      {Array.isArray(data) ? ']' : '}'}
+      {isDataArray ? ']' : '}'}
       {!isLast ? ',' : ''}
     </div>
   );
-}
+};
 ```
 
 ```jsx
-let data = {
+const data = {
   lorem: {
     ipsum: 'dolor sit',
     amet: {
@@ -119,9 +135,8 @@ let data = {
     ipsum: 'primis'
   }
 };
-ReactDOM.render(<TreeView data={data} name="data" />, document.getElementById('root'));
+ReactDOM.render(
+  <TreeView data={data} name="data" />,
+  document.getElementById('root')
+);
 ```
-
-<!-- tags: object,visual,state,recursion -->
-
-<!-- expertise: 2 -->

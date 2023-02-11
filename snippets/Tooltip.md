@@ -1,46 +1,66 @@
-### Tooltip
+---
+title: Tooltip
+tags: components,state,children
+cover: blog_images/dark-leaves-6.jpg
+firstSeen: 2018-11-13T20:21:24+02:00
+lastUpdated: 2020-11-16T15:17:26+02:00
+---
 
 Renders a tooltip component.
 
-* Use the `React.useState()` hook to create the `show` variable and initialize it to `false`.
-* Return a `<div>` element that contains the `<div>` that will be the tooltip and the `children` passed to the component.
-* Handle the `onMouseEnter` and `onMouseLeave` methods, by altering the value of the `show` variable.
+- Use the `useState()` hook to create the `show` variable and initialize it to `false`.
+- Render a container element that contains the tooltip element and the `children` passed to the component.
+- Handle the `onMouseEnter` and `onMouseLeave` methods, by altering the value of the `show` variable, toggling the `className` of the tooltip.
 
 ```css
-.tooltip {
+.tooltip-container {
   position: relative;
+}
+
+.tooltip-box {
+  position: absolute;
   background: rgba(0, 0, 0, 0.7);
-  color: white;
-  visibility: hidden;
+  color: #fff;
   padding: 5px;
   border-radius: 5px;
+  top: calc(100% + 5px);
+  display: none;
 }
+
+.tooltip-box.visible {
+  display: block;
+}
+
 .tooltip-arrow {
   position: absolute;
-  top: 100%;
+  top: -10px;
   left: 50%;
   border-width: 5px;
   border-style: solid;
-  border-color: rgba(0, 0, 0, 0.7) transparent transparent;
+  border-color: transparent transparent rgba(0, 0, 0, 0.7) transparent;
 }
 ```
 
 ```jsx
-function Tooltip({ children, text, ...rest }) {
+const Tooltip = ({ children, text, ...rest }) => {
   const [show, setShow] = React.useState(false);
 
   return (
-    <div>
-      <div className="tooltip" style={show ? { visibility: 'visible' } : {}}>
+    <div className="tooltip-container">
+      <div className={show ? 'tooltip-box visible' : 'tooltip-box'}>
         {text}
         <span className="tooltip-arrow" />
       </div>
-      <div {...rest} onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}>
+      <div
+        onMouseEnter={() => setShow(true)}
+        onMouseLeave={() => setShow(false)}
+        {...rest}
+      >
         {children}
       </div>
     </div>
   );
-}
+};
 ```
 
 ```jsx
@@ -51,7 +71,3 @@ ReactDOM.render(
   document.getElementById('root')
 );
 ```
-
-<!-- tags: visual,state,children -->
-
-<!-- expertise: 1 -->
